@@ -2,11 +2,27 @@ pipeline {
   agent any
 
   stages {
-      stage('Build Artifact') {
+       stage('Build Artifact - Maven') {
+          sh "mvn clean package  -DskipTests=true"
+          archive  'target/*.jar'
+       }
+
+       stage('Test') {
             steps {
-              sh "mvn clean package -DskipTests=true"
-              archive 'target/*.jar' //so that they can be downloaded later
+                // Run your tests with JaCoCo enabled
+                sh "mvn test"
             }
-        }   
+        
+    
+
+            post {
+              always {
+                // Publish JaCoCo coverage report
+                junit  'target/surefire-reports/*.xml'
+                jacoco. execPattern: 'target/jacoco.exec'
+        }
     }
+
+  } 
+}
 }
